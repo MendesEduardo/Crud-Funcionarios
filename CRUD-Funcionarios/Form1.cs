@@ -1,5 +1,3 @@
-using System;
-using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using CRUD_Funcionarios.Data;
 using CRUD_Funcionarios.Repositorios.Interface;
@@ -31,8 +29,16 @@ namespace CRUD_Funcionarios
             foreach (var funcionario in funcionarios)
             {
                 ListViewItem item = new ListViewItem(funcionario.Nome);
-                item.SubItems.Add(funcionario.Sobrenome);
+                item.SubItems.Add(funcionario.Equipe); // Exibe o campo "Equipe"
                 item.SubItems.Add(funcionario.Cargo);
+                item.SubItems.Add(funcionario.Salario.ToString()); // Converte o salário para string
+                item.SubItems.Add(funcionario.Horario);
+                item.SubItems.Add(funcionario.Rg);
+                item.SubItems.Add(funcionario.Nascimento.ToString()); // Converte a data de nascimento para string
+                item.SubItems.Add(funcionario.Ctps);
+                item.SubItems.Add(funcionario.Cpf);
+                item.SubItems.Add(funcionario.Email);
+                item.SubItems.Add(funcionario.Id.ToString());
                 listView1.Items.Add(item);
             }
         }
@@ -40,13 +46,24 @@ namespace CRUD_Funcionarios
         private void LimparCamposAdicao()
         {
             txtNome.Text = string.Empty;
-            txtSobrenome.Text = string.Empty;
+            txtEquipe.Text = string.Empty;
             txtCargo.Text = string.Empty;
+            txtEquipe.Text = string.Empty;
+            txtSalario.Text = string.Empty;
+            txtHorario.Text = string.Empty;
+            txtRg.Text = string.Empty;
+            txtCtps.Text = string.Empty;
+            txtNascimento.Text = string.Empty;
+            txtCpf.Text = string.Empty;
+            txtEmail.Text = string.Empty;
         }
 
         private bool ValidarCamposAdicao()
         {
-            if (string.IsNullOrWhiteSpace(txtNome.Text) || string.IsNullOrWhiteSpace(txtSobrenome.Text) || string.IsNullOrWhiteSpace(txtCargo.Text))
+            if (string.IsNullOrWhiteSpace(txtNome.Text) || string.IsNullOrWhiteSpace(txtEquipe.Text) || string.IsNullOrWhiteSpace(txtCargo.Text) ||
+                string.IsNullOrWhiteSpace(txtSalario.Text) || string.IsNullOrWhiteSpace(txtHorario.Text) || string.IsNullOrWhiteSpace(txtRg.Text) ||
+                string.IsNullOrWhiteSpace(txtCtps.Text) || string.IsNullOrWhiteSpace(txtNascimento.Text) || string.IsNullOrWhiteSpace(txtCpf.Text) ||
+                string.IsNullOrWhiteSpace(txtEmail.Text))
             {
                 MessageBox.Show("Por favor, preencha todos os campos obrigatórios.", "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -57,14 +74,42 @@ namespace CRUD_Funcionarios
         private async void AdicionarFuncionario()
         {
             string nome = txtNome.Text;
-            string sobrenome = txtSobrenome.Text;
+            string equipe = txtEquipe.Text;
             string cargo = txtCargo.Text;
+            decimal salario;
+            DateTime nascimento;
+            string horario = txtHorario.Text;
+            string rg = txtRg.Text;
+            string ctps = txtCtps.Text;
+            string cpf = txtCpf.Text;
+            string email = txtEmail.Text;
+
+            // Conversão segura para o campo "salario"
+            if (decimal.TryParse(txtSalario.Text, out salario) == false)
+            {
+                MessageBox.Show("Salário inválido. Por favor, insira um valor numérico válido.", "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Conversão segura para o campo "nascimento"
+            if (DateTime.TryParse(txtNascimento.Text, out nascimento) == false)
+            {
+                MessageBox.Show("Data de nascimento inválida. Por favor, insira uma data válida.", "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             FuncionarioModel novoFuncionario = new FuncionarioModel
             {
                 Nome = nome,
-                Sobrenome = sobrenome,
-                Cargo = cargo
+                Equipe = equipe,
+                Cargo = cargo,
+                Salario = salario,
+                Horario = horario,
+                Rg = rg,
+                Ctps = ctps,
+                Nascimento = nascimento,
+                Cpf = cpf,
+                Email = email
             };
 
             var funcionarioRepository = new FuncionariosRepositorio(dbContext);
@@ -75,7 +120,6 @@ namespace CRUD_Funcionarios
 
             MessageBox.Show("Funcionário adicionado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
         private void btnAdicionar_Click(object sender, EventArgs e)
         {
             if (ValidarCamposAdicao())
@@ -87,8 +131,15 @@ namespace CRUD_Funcionarios
         private void PreencherCamposDeAtualizacao(FuncionarioModel funcionario)
         {
             txtUpdateNome.Text = funcionario.Nome;
-            txtUpdateSobrenome.Text = funcionario.Sobrenome;
+            txtUpdateEquipe.Text = funcionario.Equipe; // Nome do campo atualizado
             txtUpdateCargo.Text = funcionario.Cargo;
+            txtUpdateSalario.Text = funcionario.Salario.ToString(); // Preencha com o salário formatado
+            txtUpdateHorario.Text = funcionario.Horario;
+            txtUpdateRg.Text = funcionario.Rg;
+            txtUpdateCtps.Text = funcionario.Ctps;
+            txtUpdateNascimento.Text = funcionario.Nascimento.ToString("yyyy-MM-dd"); // Preencha com a data de nascimento formatada
+            txtUpdateCpf.Text = funcionario.Cpf;
+            txtUpdateEmail.Text = funcionario.Email;
         }
 
         private async void btnBuscar_Click(object sender, EventArgs e)
@@ -120,17 +171,33 @@ namespace CRUD_Funcionarios
             if (funcionarioExistente != null)
             {
                 funcionarioExistente.Nome = funcionarioAtualizado.Nome;
-                funcionarioExistente.Sobrenome = funcionarioAtualizado.Sobrenome;
+                funcionarioExistente.Equipe = funcionarioAtualizado.Equipe;
                 funcionarioExistente.Cargo = funcionarioAtualizado.Cargo;
+                funcionarioExistente.Salario = funcionarioAtualizado.Salario;
+                funcionarioExistente.Horario = funcionarioAtualizado.Horario;
+                funcionarioExistente.Rg = funcionarioAtualizado.Rg;
+                funcionarioExistente.Ctps = funcionarioAtualizado.Ctps;
+                funcionarioExistente.Nascimento = funcionarioAtualizado.Nascimento;
+                funcionarioExistente.Cpf = funcionarioAtualizado.Cpf;
+                funcionarioExistente.Email = funcionarioAtualizado.Email;
 
                 await funcionarioRepository.Atualizar(funcionarioExistente, idFuncionario);
 
                 MessageBox.Show("Funcionário atualizado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 txtUpdateNome.Text = string.Empty;
-                txtUpdateSobrenome.Text = string.Empty;
+                txtUpdateEquipe.Text = string.Empty;
                 txtUpdateCargo.Text = string.Empty;
+                txtUpdateSalario.Text = string.Empty;
+                txtUpdateHorario.Text = string.Empty;
+                txtUpdateRg.Text = string.Empty;
+                txtUpdateCtps.Text = string.Empty;
+                txtUpdateNascimento.Text = string.Empty;
+                txtUpdateCpf.Text = string.Empty;
+                txtUpdateEmail.Text = string.Empty;
                 txtbuscarId.Text = string.Empty;
+
+                btnListar_Click(null, null); // Atualizar a lista após a atualização.
             }
             else
             {
@@ -147,17 +214,58 @@ namespace CRUD_Funcionarios
             }
 
             string nomeAtualizado = txtUpdateNome.Text;
-            string sobrenomeAtualizado = txtUpdateSobrenome.Text;
+            string equipeAtualizada = txtUpdateEquipe.Text;
             string cargoAtualizado = txtUpdateCargo.Text;
+            decimal salarioAtualizado;
+            DateTime nascimentoAtualizado;
+            string horarioAtualizado = txtUpdateHorario.Text;
+            string rgAtualizado = txtUpdateRg.Text;
+            string ctpsAtualizado = txtUpdateCtps.Text;
+            string cpfAtualizado = txtUpdateCpf.Text;
+            string emailAtualizado = txtUpdateEmail.Text;
+
+            // Conversão segura para o campo "salarioAtualizado"
+            if (decimal.TryParse(txtUpdateSalario.Text, out salarioAtualizado) == false)
+            {
+                MessageBox.Show("Salário inválido. Por favor, insira um valor numérico válido.", "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Conversão segura para o campo "nascimentoAtualizado"
+            if (DateTime.TryParse(txtUpdateNascimento.Text, out nascimentoAtualizado) == false)
+            {
+                MessageBox.Show("Data de nascimento inválida. Por favor, insira uma data válida.", "Erro de Validação", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             FuncionarioModel funcionarioAtualizado = new FuncionarioModel
             {
                 Nome = nomeAtualizado,
-                Sobrenome = sobrenomeAtualizado,
-                Cargo = cargoAtualizado
+                Equipe = equipeAtualizada,
+                Cargo = cargoAtualizado,
+                Salario = salarioAtualizado,
+                Horario = horarioAtualizado,
+                Rg = rgAtualizado,
+                Ctps = ctpsAtualizado,
+                Nascimento = nascimentoAtualizado,
+                Cpf = cpfAtualizado,
+                Email = emailAtualizado
             };
 
             AtualizarFuncionario(idFuncionario, funcionarioAtualizado);
+
+            // Limpar os campos após a atualização bem-sucedida.
+            txtUpdateNome.Text = string.Empty;
+            txtUpdateEquipe.Text = string.Empty;
+            txtUpdateCargo.Text = string.Empty;
+            txtUpdateSalario.Text = string.Empty;
+            txtUpdateHorario.Text = string.Empty;
+            txtUpdateRg.Text = string.Empty;
+            txtUpdateCtps.Text = string.Empty;
+            txtUpdateNascimento.Text = string.Empty;
+            txtUpdateCpf.Text = string.Empty;
+            txtUpdateEmail.Text = string.Empty;
+            txtbuscarId.Text = string.Empty;
         }
 
         private async void btnBusca_Click(object sender, EventArgs e)
@@ -176,8 +284,15 @@ namespace CRUD_Funcionarios
             if (funcionarioEncontrado != null)
             {
                 ListViewItem item = new ListViewItem(funcionarioEncontrado.Nome);
-                item.SubItems.Add(funcionarioEncontrado.Sobrenome);
+                item.SubItems.Add(funcionarioEncontrado.Equipe);
                 item.SubItems.Add(funcionarioEncontrado.Cargo);
+                item.SubItems.Add(funcionarioEncontrado.Salario.ToString()); // Adicione o campo "Salario"
+                item.SubItems.Add(funcionarioEncontrado.Horario);
+                item.SubItems.Add(funcionarioEncontrado.Rg);
+                item.SubItems.Add(funcionarioEncontrado.Ctps);
+                item.SubItems.Add(funcionarioEncontrado.Nascimento.ToString()); // Adicione o campo "Nascimento"
+                item.SubItems.Add(funcionarioEncontrado.Cpf);
+                item.SubItems.Add(funcionarioEncontrado.Email);
                 listView2.Items.Add(item);
             }
             else

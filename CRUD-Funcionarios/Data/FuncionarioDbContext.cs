@@ -10,7 +10,7 @@ namespace CRUD_Funcionarios.Data
         {
 
         }
-        public DbSet<FuncionarioModel> Funcionarios { get; set; }
+        public DbSet<FuncionarioModel> Funcionario { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

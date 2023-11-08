@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using CRUD_Funcionarios.Model; // Certifique-se de que FuncionarioModel esteja definido aqui
 
 namespace CRUD_Funcionarios.Repositorios.Interface
